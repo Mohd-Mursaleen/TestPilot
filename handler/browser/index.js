@@ -1,4 +1,4 @@
-import puppeteer from "puppeteer-core";
+import { webkit, chromium } from "playwright";
 import * as cheerio from "cheerio";
 import dotenv from "dotenv";
 
@@ -21,28 +21,30 @@ const log = (message, data = {}) => {
 
 // Launches the browser and sets up the page
 async function setupBrowser() {
-  const browserExecPath =
-    process.env.BROWSER_PATH ||
-    "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome";
-  const browser = await puppeteer.launch({
-    headless: false,
-    devtools: false,
-    executablePath: browserExecPath,
-    args: [
-      "--no-sandbox",
-      "--start-maximized",
-      "--disable-setuid-sandbox",
-      "--disable-blink-features=AutomationControlled",
-      "--disable-extensions",
-      "--no-first-run",
-    ],
+  // Get the browser type from environment variables or default to webkit (Safari)
+  const browserType = process.env.BROWSER_TYPE || 'webkit';
+  const bravePath = '/Applications/Brave Browser.app/Contents/MacOS/Brave Browser';
+  
+  let browser;
+  if (browserType === 'webkit') {
+    // Use Safari (WebKit)
+    browser = await webkit.launch({
+      headless: false
+    });
+  } else if (browserType === 'brave') {
+    // Use Brave
+    browser = await chromium.launch({
+      headless: false,
+      executablePath: bravePath
+    });
+  } else {
+    throw new Error('Unsupported browser type. Please use "webkit" for Safari or "brave" for Brave browser');
+  }
+  const context = await browser.newContext({
+    viewport: { width: 1920, height: 1080 },
+    userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
   });
-  const page = await browser.newPage();
-
-  await page.setUserAgent(
-    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
-  );
-  await page.setViewport({ width: 1920, height: 1080 });
+  const page = await context.newPage();
 
   // Handle pop-ups and cookie consents
   page.on("load", async () => {
@@ -55,8 +57,8 @@ async function setupBrowser() {
         "[class*='accept']",
       ];
       for (const selector of selectors) {
-        const button = await page.$(selector);
-        if (button) {
+        const button = await page.locator(selector).first();
+        if (await button.isVisible()) {
           await button.click();
           log("Dismissed cookie consent popup", { selector });
           break;
@@ -164,9 +166,9 @@ async function cleanHtmlForProcessing(page) {
 async function navigateToWebsite(page, url) {
   try {
     log("Navigating to website", { url });
-    await page.goto(url, { waitUntil: "networkidle2", timeout: 60000 });
+    await page.goto(url, { waitUntil: "networkidle", timeout: 60000 });
 
-    const finalUrl = await page.url();
+    const finalUrl = page.url();
     log("Successfully navigated to website", {
       originalUrl: url,
       finalUrl: finalUrl,
