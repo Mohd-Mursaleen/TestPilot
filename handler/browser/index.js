@@ -1,7 +1,7 @@
-const puppeteer = require("puppeteer-core");
-const cheerio = require("cheerio");
-const dotenv = require("dotenv");
-const fs = require("fs");
+import puppeteer from "puppeteer-core";
+import * as cheerio from "cheerio";
+import dotenv from "dotenv";
+
 dotenv.config();
 
 // Utility function for structured logging
@@ -279,4 +279,4 @@ async function browserAutomation(testId, url, options = {}) {
   }
 }
 
-module.exports = browserAutomation;
+export default browserAutomation;

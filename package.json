@@ -1,6 +1,7 @@
 {
   "name": "website-testing-tool",
   "version": "1.0.0",
+  "type": "module",
   "main": "server.js",
   "scripts": {
     "test": "jest",

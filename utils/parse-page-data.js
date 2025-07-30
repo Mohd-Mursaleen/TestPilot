@@ -86,4 +86,4 @@ async function structuredDataOfPage(page) {
   }
 }
 
-exports = { structuredDataOfPage };
+export { structuredDataOfPage };

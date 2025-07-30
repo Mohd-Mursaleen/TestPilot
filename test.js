@@ -1,4 +1,4 @@
-const browserAutomation = require("./handler/browser/index");
+import browserAutomation from "./handler/browser/index.js";
 
 // Run the test
 async function runTest() {
