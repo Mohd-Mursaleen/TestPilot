@@ -5,7 +5,8 @@
   "main": "server.js",
   "scripts": {
     "test": "jest",
-    "start": "nodemon server.js"
+    "start": "nodemon server.js",
+    "analyze": "node analyze-website.js"
   },
   "author": "",
   "license": "ISC",
@@ -18,6 +19,7 @@
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
     "fs": "^0.0.1-security",
+    "openai": "^5.11.0",
     "playwright": "^1.54.1",
     "socket.io": "^4.7.5"
   },
