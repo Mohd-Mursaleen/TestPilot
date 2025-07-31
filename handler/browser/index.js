@@ -80,7 +80,7 @@ async function cleanHtmlForProcessing(page) {
   const $ = cheerio.load(content);
 
   // Remove script, style, svg, and other non-essential elements
-  $("script, style, svg, iframe, noscript, meta, link, head").remove();
+  $("script, style, svg, iframe, noscript, meta, a, head").remove();
 
   // Remove all comments
   $("*")
